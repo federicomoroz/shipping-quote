@@ -8,9 +8,7 @@ from app.use_cases.pipeline import ClassifyZoneStep, QuoteContext, ValidateEligi
 
 
 def _request(**overrides):
-    defaults = dict(
-        weight_kg=4, length_cm=30, width_cm=20, height_cm=15, declared_value_ars=25000, postal_code=1425
-    )
+    defaults = dict(weight_kg=4, length_cm=30, width_cm=20, height_cm=15, postal_code=1425)
     defaults.update(overrides)
     return QuoteRequest(**defaults)
 

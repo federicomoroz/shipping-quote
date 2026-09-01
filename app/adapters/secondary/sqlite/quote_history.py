@@ -1,3 +1,5 @@
+import asyncio
+
 import app.core.database as database
 from app.adapters.secondary.sqlite.orm import QuoteRecord
 from app.domain.zones import Zone
@@ -7,9 +9,18 @@ from app.ports.quote_history_port import DEFAULT_HISTORY_LIMIT, QuoteHistoryPort
 class SQLiteQuoteHistory(QuoteHistoryPort):
     """Importa el modulo `database`, no `SessionLocal` directo: los tests parchean
     `database.SessionLocal` y necesitan que este adapter lo resuelva en cada
-    llamada, no que lo capture una sola vez al importarse."""
+    llamada, no que lo capture una sola vez al importarse.
+
+    SQLAlchemy sincronico no tiene forma nativa de correr en el event loop de
+    asyncio sin bloquearlo; `asyncio.to_thread` delega cada operacion a un
+    hilo del executor para que una consulta lenta no frene el resto de los
+    requests concurrentes.
+    """
 
     async def save(self, record: QuoteRecordData) -> None:
+        await asyncio.to_thread(self._save_sync, record)
+
+    def _save_sync(self, record: QuoteRecordData) -> None:
         db = database.SessionLocal()
         try:
             db.add(
@@ -27,6 +38,9 @@ class SQLiteQuoteHistory(QuoteHistoryPort):
             db.close()
 
     async def list_recent(self, limit: int = DEFAULT_HISTORY_LIMIT) -> list[QuoteRecordData]:
+        return await asyncio.to_thread(self._list_recent_sync, limit)
+
+    def _list_recent_sync(self, limit: int) -> list[QuoteRecordData]:
         db = database.SessionLocal()
         try:
             rows = db.query(QuoteRecord).order_by(QuoteRecord.id.desc()).limit(limit).all()

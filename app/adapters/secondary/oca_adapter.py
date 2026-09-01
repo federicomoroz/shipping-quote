@@ -1,30 +1,21 @@
+from decimal import Decimal
+
 import httpx
 
-from app.domain.package import Package
-from app.domain.trace import Tracer
-from app.domain.zones import Zone
-from app.ports.carrier_port import CARRIER_REQUEST_TIMEOUT_S, CarrierPort, CarrierQuote, CarrierUnavailableError
+from app.adapters.secondary.http_carrier_adapter import HttpCarrierAdapter
+from app.ports.carrier_port import CarrierPort, CarrierQuote
+
+CARRIER_NAME = "OCA"
+ENDPOINT_PATH = "/oca/quote"
 
 
-class OCAAdapter(CarrierPort):
-    name = "OCA"
-
-    def __init__(self, client: httpx.AsyncClient) -> None:
-        self._client = client
-
-    async def get_rate(self, package: Package, zone: Zone, tracer: Tracer) -> CarrierQuote:
-        tracer.mark("adaptador_secundario", self.name, "traduciendo Package -> {weight, region}")
-        try:
-            response = await self._client.post(
-                "/oca/quote",
-                json={"weight": package.effective_weight_kg, "region": zone.value},
-                timeout=CARRIER_REQUEST_TIMEOUT_S,
-            )
-            response.raise_for_status()
-        except httpx.HTTPError as exc:
-            tracer.mark("salida", self.name, "sin respuesta")
-            raise CarrierUnavailableError("OCA no disponible") from exc
-
-        data = response.json()
-        tracer.mark("salida", self.name, f"price={data['price']} estimated_delivery={data['estimated_delivery']}")
-        return CarrierQuote(amount_ars=data["price"], eta_days=data["estimated_delivery"])
+def build_oca_adapter(client: httpx.AsyncClient) -> CarrierPort:
+    return HttpCarrierAdapter(
+        name=CARRIER_NAME,
+        client=client,
+        endpoint_path=ENDPOINT_PATH,
+        build_request=lambda package, zone: {"weight": package.effective_weight_kg, "region": zone.value},
+        parse_response=lambda data: CarrierQuote(
+            amount_ars=Decimal(str(data["price"])), eta_days=data["estimated_delivery"]
+        ),
+    )

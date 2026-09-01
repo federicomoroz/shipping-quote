@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from app.domain.trace import TraceRecorder
 from app.domain.zones import Zone
 from app.ports.carrier_port import CarrierPort, CarrierQuote, CarrierUnavailableError
@@ -32,15 +34,16 @@ class _FakeHistory(QuoteHistoryPort):
 
 
 def _request(**overrides):
-    defaults = dict(
-        weight_kg=4, length_cm=30, width_cm=20, height_cm=15, declared_value_ars=25000, postal_code=1425
-    )
+    defaults = dict(weight_kg=4, length_cm=30, width_cm=20, height_cm=15, postal_code=1425)
     defaults.update(overrides)
     return QuoteRequest(**defaults)
 
 
 async def test_use_case_returns_all_carrier_results():
-    carriers = [_FakeCarrier("A", amount_ars=1000, eta_days=3), _FakeCarrier("B", amount_ars=1200, eta_days=2)]
+    carriers = [
+        _FakeCarrier("A", amount_ars=Decimal("1000"), eta_days=3),
+        _FakeCarrier("B", amount_ars=Decimal("1200"), eta_days=2),
+    ]
     history = _FakeHistory()
     use_case = QuoteShippingUseCase(carriers=carriers, history=history)
 
@@ -54,7 +57,7 @@ async def test_use_case_returns_all_carrier_results():
 
 async def test_use_case_tolerates_one_failing_carrier():
     carriers = [
-        _FakeCarrier("Confiable", amount_ars=1000, eta_days=3),
+        _FakeCarrier("Confiable", amount_ars=Decimal("1000"), eta_days=3),
         _FakeCarrier("Caido", fails=True),
     ]
     use_case = QuoteShippingUseCase(carriers=carriers, history=_FakeHistory())
@@ -69,7 +72,7 @@ async def test_use_case_tolerates_one_failing_carrier():
 
 
 async def test_use_case_trace_covers_full_circuit():
-    carriers = [_FakeCarrier("A", amount_ars=1000, eta_days=3)]
+    carriers = [_FakeCarrier("A", amount_ars=Decimal("1000"), eta_days=3)]
     use_case = QuoteShippingUseCase(carriers=carriers, history=_FakeHistory())
 
     response = await use_case.execute(_request(), TraceRecorder())

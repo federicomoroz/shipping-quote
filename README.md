@@ -28,10 +28,15 @@ uvicorn app.main:app --port 8005 --reload
 ```
 
 Abrir `http://localhost:8005`. Un solo comando, sin Docker ni servicios
-externos: SQLite es el único estado, y los "transportistas externos" son un
-sub-app de FastAPI aparte, conectado únicamente por `ASGITransport` (nunca
-abre un socket real), así el mismo código de los adaptadores corre igual en
-tests y en producción.
+externos: SQLite es el único estado (por default `sqlite:///shipping_gondola.db`,
+sobreescribible con la env var `DATABASE_URL`), y los "transportistas externos"
+son un sub-app de FastAPI aparte, conectado únicamente por `ASGITransport`
+(nunca abre un socket real), así el mismo código de los adaptadores corre
+igual en tests y en producción.
+
+El servidor crea la tabla con `create_all()` si no existe, para que correr
+`uvicorn` alcance sin pasos manuales. Para evolucionar el schema de verdad
+existen migraciones aparte (ver abajo).
 
 ## Tests
 
@@ -39,9 +44,25 @@ tests y en producción.
 pytest -q
 ```
 
-30 tests: reglas de dominio puras, pasos del pipeline, el caso de uso con
+[![tests](https://github.com/federicomoroz/shipping-gondola/actions/workflows/tests.yml/badge.svg)](https://github.com/federicomoroz/shipping-gondola/actions/workflows/tests.yml)
+
+31 tests: reglas de dominio puras, pasos del pipeline, el caso de uso con
 adaptadores falsos (incluyendo uno que falla a propósito), cada adaptador
-real contra su mock, y la integración completa `POST /api/quote`.
+real contra su mock, y la integración completa `POST /api/quote`. Corren en
+CI (GitHub Actions) en cada push.
+
+## Migraciones
+
+```bash
+alembic upgrade head        # aplicar
+alembic revision --autogenerate -m "descripcion"   # generar una nueva
+```
+
+`migrations/env.py` toma la URL de `app.core.database.DATABASE_URL` (no está
+duplicada en `alembic.ini`), así que respeta la misma env var que usa la app.
+Es una herramienta aparte del `create_all()` del arranque a propósito: los
+tests parchean el engine, no la URL, y engancharlo al lifespan hubiera hecho
+que los tests migraran la base real en vez de la de memoria.
 
 ## Arquitectura
 
@@ -75,6 +96,15 @@ app/
   "llamo a 3 y listo".
 - **Peso volumétrico.** El peso efectivo es `max(peso real, largo×ancho×alto / 5000)`,
   la fórmula estándar de la industria — el dominio no es un `if` aislado.
+- **`HttpCarrierAdapter` genérico** (`adapters/secondary/http_carrier_adapter.py`).
+  Los 3 transportistas no son 3 clases con el mismo try/except/timeout
+  repetido: son la misma clase configurada por composición (endpoint +
+  2 funciones de mapeo). Agregar un cuarto transportista es un archivo de
+  ~15 líneas, no una clase entera.
+- **`Decimal`, no `float`, para plata.** `apply_service_fee()` opera en
+  `Decimal` y redondea con `ROUND_HALF_UP` explícito — el `round()` nativo de
+  Python usa banker's rounding, que para dinero da resultados que sorprenden
+  (ver `test_apply_service_fee_rounds_half_up_not_banker`).
 
 ### Fuera de alcance (a propósito)
 
@@ -91,4 +121,4 @@ completo.
 
 ## Stack
 
-FastAPI · SQLAlchemy (SQLite) · httpx · Pydantic · pytest + pytest-asyncio
+FastAPI · SQLAlchemy (SQLite) · Alembic · httpx · Pydantic · pytest + pytest-asyncio

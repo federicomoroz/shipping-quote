@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from decimal import Decimal
 
 from app.domain.package import Package
 from app.domain.trace import Tracer
@@ -18,7 +19,7 @@ CARRIER_REQUEST_TIMEOUT_S = 2.0
 
 @dataclass(frozen=True)
 class CarrierQuote:
-    amount_ars: float
+    amount_ars: Decimal
     eta_days: int
 
 

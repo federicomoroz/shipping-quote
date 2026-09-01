@@ -14,7 +14,6 @@ class Package:
     length_cm: float
     width_cm: float
     height_cm: float
-    declared_value_ars: float
 
     @property
     def volumetric_weight_kg(self) -> float:
@@ -25,14 +24,8 @@ class Package:
         return max(self.weight_kg, self.volumetric_weight_kg)
 
 
-def build_package(
-    weight_kg: float,
-    length_cm: float,
-    width_cm: float,
-    height_cm: float,
-    declared_value_ars: float,
-) -> Package:
-    package = Package(weight_kg, length_cm, width_cm, height_cm, declared_value_ars)
+def build_package(weight_kg: float, length_cm: float, width_cm: float, height_cm: float) -> Package:
+    package = Package(weight_kg, length_cm, width_cm, height_cm)
     if package.effective_weight_kg > MAX_EFFECTIVE_WEIGHT_KG:
         raise PackageTooHeavyError(
             f"peso efectivo {package.effective_weight_kg:.1f}kg supera el maximo "

@@ -122,7 +122,6 @@ th { color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; font-w
         <label>Largo (cm)<input type="number" step="1" name="length_cm" value="30" required></label>
         <label>Ancho (cm)<input type="number" step="1" name="width_cm" value="20" required></label>
         <label>Alto (cm)<input type="number" step="1" name="height_cm" value="15" required></label>
-        <label>Valor declarado (ARS)<input type="number" step="100" name="declared_value_ars" value="25000" required></label>
         <label>Codigo postal<input type="number" step="1" name="postal_code" value="1425" required></label>
         <button type="submit" class="run-btn">&gt; EJECUTAR CIRCUITO</button>
       </form>

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+from decimal import Decimal
 
 from app.domain.zones import Zone
 
@@ -15,7 +16,7 @@ class QuoteRecordData:
     zone: Zone
     effective_weight_kg: float
     best_carrier: str | None
-    best_amount_ars: float | None
+    best_amount_ars: Decimal | None
     id: int | None = None
 
 

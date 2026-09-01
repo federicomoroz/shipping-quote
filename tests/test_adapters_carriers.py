@@ -1,8 +1,8 @@
 import pytest
 
-from app.adapters.secondary.andreani_adapter import AndreaniAdapter
-from app.adapters.secondary.correo_argentino_adapter import CorreoArgentinoAdapter
-from app.adapters.secondary.oca_adapter import OCAAdapter
+from app.adapters.secondary.andreani_adapter import build_andreani_adapter
+from app.adapters.secondary.correo_argentino_adapter import build_correo_argentino_adapter
+from app.adapters.secondary.oca_adapter import build_oca_adapter
 from app.core.http_client import build_carrier_client
 from app.domain.package import build_package
 from app.domain.trace import TraceRecorder
@@ -19,12 +19,12 @@ async def carrier_client():
 
 
 def _package():
-    return build_package(weight_kg=4, length_cm=30, width_cm=20, height_cm=15, declared_value_ars=25000)
+    return build_package(weight_kg=4, length_cm=30, width_cm=20, height_cm=15)
 
 
 async def test_correo_argentino_adapter_translates_shape(carrier_client, monkeypatch):
     monkeypatch.setattr("app.external_mocks.carrier_mocks.random.random", lambda: 0.99)
-    adapter = CorreoArgentinoAdapter(carrier_client)
+    adapter = build_correo_argentino_adapter(carrier_client)
     tracer = TraceRecorder()
 
     quote = await adapter.get_rate(_package(), Zone.AMBA, tracer)
@@ -38,21 +38,21 @@ async def test_correo_argentino_adapter_translates_shape(carrier_client, monkeyp
 
 async def test_correo_argentino_adapter_raises_when_carrier_fails(carrier_client, monkeypatch):
     monkeypatch.setattr("app.external_mocks.carrier_mocks.random.random", lambda: 0.01)
-    adapter = CorreoArgentinoAdapter(carrier_client)
+    adapter = build_correo_argentino_adapter(carrier_client)
 
     with pytest.raises(CarrierUnavailableError):
         await adapter.get_rate(_package(), Zone.AMBA, TraceRecorder())
 
 
 async def test_oca_adapter_translates_shape(carrier_client):
-    adapter = OCAAdapter(carrier_client)
+    adapter = build_oca_adapter(carrier_client)
     quote = await adapter.get_rate(_package(), Zone.INTERIOR, TraceRecorder())
     assert quote.amount_ars > 0
     assert quote.eta_days > 0
 
 
 async def test_andreani_adapter_translates_shape(carrier_client):
-    adapter = AndreaniAdapter(carrier_client)
+    adapter = build_andreani_adapter(carrier_client)
     quote = await adapter.get_rate(_package(), Zone.PATAGONIA, TraceRecorder())
     assert quote.amount_ars > 0
     assert quote.eta_days > 0

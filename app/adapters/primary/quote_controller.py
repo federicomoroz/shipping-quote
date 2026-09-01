@@ -21,7 +21,6 @@ class QuotePayload(BaseModel):
     length_cm: float = Field(gt=0, le=MAX_INPUT_DIMENSION_CM)
     width_cm: float = Field(gt=0, le=MAX_INPUT_DIMENSION_CM)
     height_cm: float = Field(gt=0, le=MAX_INPUT_DIMENSION_CM)
-    declared_value_ars: float = Field(ge=0)
     postal_code: int = Field(ge=MIN_POSTAL_CODE, le=MAX_POSTAL_CODE)
 
 
@@ -44,7 +43,6 @@ async def post_quote(payload: QuotePayload, use_case: ShippingQuotePort = Depend
         length_cm=payload.length_cm,
         width_cm=payload.width_cm,
         height_cm=payload.height_cm,
-        declared_value_ars=payload.declared_value_ars,
         postal_code=payload.postal_code,
     )
 

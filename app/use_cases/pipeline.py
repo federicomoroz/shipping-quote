@@ -24,9 +24,7 @@ class ValidateEligibilityStep:
 
     async def execute(self, ctx: QuoteContext) -> None:
         r = ctx.request
-        ctx.package = build_package(
-            r.weight_kg, r.length_cm, r.width_cm, r.height_cm, r.declared_value_ars
-        )
+        ctx.package = build_package(r.weight_kg, r.length_cm, r.width_cm, r.height_cm)
         ctx.tracer.mark(
             "dominio",
             "ValidateEligibilityStep",

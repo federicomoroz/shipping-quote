@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from decimal import Decimal
 
 from app.domain.trace import TraceEntry, Tracer
 from app.domain.zones import Zone
@@ -11,7 +12,6 @@ class QuoteRequest:
     length_cm: float
     width_cm: float
     height_cm: float
-    declared_value_ars: float
     postal_code: int
 
 
@@ -19,7 +19,7 @@ class QuoteRequest:
 class CarrierResult:
     carrier: str
     ok: bool
-    amount_ars: float | None
+    amount_ars: Decimal | None
     eta_days: int | None
     error: str | None
 

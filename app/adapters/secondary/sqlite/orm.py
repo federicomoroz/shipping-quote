@@ -1,6 +1,10 @@
-from sqlalchemy import Column, DateTime, Float, Integer, String
+from sqlalchemy import Column, DateTime, Float, Integer, Numeric, String
 
 from app.core.database import Base
+
+# ARS hasta 10 digitos enteros + 2 decimales; de sobra para este dominio.
+MONEY_PRECISION = 10
+MONEY_SCALE = 2
 
 
 class QuoteRecord(Base):
@@ -12,4 +16,4 @@ class QuoteRecord(Base):
     zone = Column(String, nullable=False)
     effective_weight_kg = Column(Float, nullable=False)
     best_carrier = Column(String, nullable=True)
-    best_amount_ars = Column(Float, nullable=True)
+    best_amount_ars = Column(Numeric(MONEY_PRECISION, MONEY_SCALE), nullable=True)

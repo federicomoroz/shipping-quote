@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -6,13 +7,15 @@ from fastapi.responses import HTMLResponse
 import app.core.database as database
 from app.adapters.primary.quote_controller import router as quote_router
 from app.adapters.primary.spa import render_spa
-from app.adapters.secondary.andreani_adapter import AndreaniAdapter
-from app.adapters.secondary.correo_argentino_adapter import CorreoArgentinoAdapter
-from app.adapters.secondary.oca_adapter import OCAAdapter
+from app.adapters.secondary.andreani_adapter import build_andreani_adapter
+from app.adapters.secondary.correo_argentino_adapter import build_correo_argentino_adapter
+from app.adapters.secondary.oca_adapter import build_oca_adapter
 from app.adapters.secondary.sqlite.quote_history import SQLiteQuoteHistory
 from app.core.http_client import build_carrier_client
 from app.external_mocks.carrier_mocks import mocks_app
 from app.use_cases.quote_shipping import QuoteShippingUseCase
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
 
 @asynccontextmanager
@@ -23,9 +26,9 @@ async def lifespan(app: FastAPI):
 
     http_client = build_carrier_client(mocks_app)
     carriers = [
-        CorreoArgentinoAdapter(http_client),
-        OCAAdapter(http_client),
-        AndreaniAdapter(http_client),
+        build_correo_argentino_adapter(http_client),
+        build_oca_adapter(http_client),
+        build_andreani_adapter(http_client),
     ]
     history = SQLiteQuoteHistory()
 
