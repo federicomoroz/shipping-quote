@@ -1,9 +1,13 @@
 # shipping-quote
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/federicomoroz/shipping-quote)
+
 Cotizador de envíos que existe para mostrar un circuito de arquitectura hexagonal
 funcionando de verdad, no como diagrama: cada request real que procesa queda
 trazado hop por hop, desde que entra por HTTP hasta que tres transportistas
 distintos devuelven su propia cotización.
+
+**Demo en vivo:** _(pendiente — completar tras el deploy)_
 
 ```
 entrada -> adaptador -> puerto -> caso de uso -> dominio -> puerto -> adaptador -> salida
