@@ -7,7 +7,7 @@ funcionando de verdad, no como diagrama: cada request real que procesa queda
 trazado hop por hop, desde que entra por HTTP hasta que tres transportistas
 distintos devuelven su propia cotización.
 
-**Demo en vivo:** _(pendiente — completar tras el deploy)_
+**Demo en vivo:** [shipping-quote.onrender.com](https://shipping-quote.onrender.com/) _(free tier: se duerme tras 15 min sin tráfico, el primer request tarda ~30-50s)_
 
 ```
 entrada -> adaptador -> puerto -> caso de uso -> dominio -> puerto -> adaptador -> salida
