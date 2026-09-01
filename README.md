@@ -1,4 +1,4 @@
-# shipping-gondola
+# shipping-quote
 
 Cotizador de envíos que existe para mostrar un circuito de arquitectura hexagonal
 funcionando de verdad, no como diagrama: cada request real que procesa queda
@@ -28,7 +28,7 @@ uvicorn app.main:app --port 8005 --reload
 ```
 
 Abrir `http://localhost:8005`. Un solo comando, sin Docker ni servicios
-externos: SQLite es el único estado (por default `sqlite:///shipping_gondola.db`,
+externos: SQLite es el único estado (por default `sqlite:///shipping_quote.db`,
 sobreescribible con la env var `DATABASE_URL`), y los "transportistas externos"
 son un sub-app de FastAPI aparte, conectado únicamente por `ASGITransport`
 (nunca abre un socket real), así el mismo código de los adaptadores corre
@@ -44,7 +44,7 @@ existen migraciones aparte (ver abajo).
 pytest -q
 ```
 
-[![tests](https://github.com/federicomoroz/shipping-gondola/actions/workflows/tests.yml/badge.svg)](https://github.com/federicomoroz/shipping-gondola/actions/workflows/tests.yml)
+[![tests](https://github.com/federicomoroz/shipping-quote/actions/workflows/tests.yml/badge.svg)](https://github.com/federicomoroz/shipping-quote/actions/workflows/tests.yml)
 
 31 tests: reglas de dominio puras, pasos del pipeline, el caso de uso con
 adaptadores falsos (incluyendo uno que falla a propósito), cada adaptador

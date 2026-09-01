@@ -4,7 +4,7 @@ def render_spa() -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>shipping-gondola</title>
+<title>shipping-quote</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -105,7 +105,7 @@ th { color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; font-w
 <body>
 <div class="crt">
   <header>
-    <h1>&gt; SHIPPING-GONDOLA<span class="cursor">_</span></h1>
+    <h1>&gt; SHIPPING-QUOTE<span class="cursor">_</span></h1>
     <p class="subtitle">cotizador de envios &mdash; arquitectura hexagonal en vivo</p>
   </header>
 

@@ -40,7 +40,7 @@ async def lifespan(app: FastAPI):
     await http_client.aclose()
 
 
-app = FastAPI(title="shipping-gondola", lifespan=lifespan)
+app = FastAPI(title="shipping-quote", lifespan=lifespan)
 app.include_router(quote_router)
 
 
