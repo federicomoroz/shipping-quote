@@ -1,6 +1,7 @@
 import pytest
 
 from app.domain.pricing import apply_service_fee, weight_bracket
+from app.domain.zones import Zone
 
 
 @pytest.mark.parametrize(
@@ -12,8 +13,8 @@ def test_weight_bracket(weight, expected_bracket):
 
 
 def test_apply_service_fee_amba_liviano():
-    assert apply_service_fee(1000, "AMBA", 3) == 1060
+    assert apply_service_fee(1000, Zone.AMBA, 3) == 1060
 
 
 def test_apply_service_fee_patagonia_pesado():
-    assert apply_service_fee(1000, "Patagonia", 28) == 1250
+    assert apply_service_fee(1000, Zone.PATAGONIA, 28) == 1250

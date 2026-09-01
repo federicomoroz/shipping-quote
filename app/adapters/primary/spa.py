@@ -161,6 +161,10 @@ const traceBox = document.getElementById('trace-panel');
 const traceLog = document.getElementById('trace-log');
 const errorMsg = document.getElementById('form-error');
 
+const TRACE_STEP_MIN_DELAY_MS = 40;
+const TRACE_STEP_MAX_DELAY_MS = 260;
+const TRACE_STEP_DELAY_SCALE = 2;
+
 const STEP_LABELS = {
   entrada: 'ENTRADA',
   adaptador_primario: 'ADAPTADOR',
@@ -258,7 +262,12 @@ function animateTrace(trace) {
     traceLog.appendChild(line);
     traceLog.scrollTop = traceLog.scrollHeight;
     i++;
-    const gap = i < trace.length ? Math.min(Math.max((trace[i].elapsed_ms - entry.elapsed_ms) * 2, 40), 260) : 0;
+    const gap = i < trace.length
+      ? Math.min(
+          Math.max((trace[i].elapsed_ms - entry.elapsed_ms) * TRACE_STEP_DELAY_SCALE, TRACE_STEP_MIN_DELAY_MS),
+          TRACE_STEP_MAX_DELAY_MS
+        )
+      : 0;
     setTimeout(next, gap);
   }
   next();

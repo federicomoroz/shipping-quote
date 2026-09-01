@@ -1,6 +1,7 @@
 import app.core.database as database
-from app.models.orm import QuoteRecord
-from app.ports.quote_history_port import QuoteHistoryPort, QuoteRecordData
+from app.adapters.secondary.sqlite.orm import QuoteRecord
+from app.domain.zones import Zone
+from app.ports.quote_history_port import DEFAULT_HISTORY_LIMIT, QuoteHistoryPort, QuoteRecordData
 
 
 class SQLiteQuoteHistory(QuoteHistoryPort):
@@ -15,7 +16,7 @@ class SQLiteQuoteHistory(QuoteHistoryPort):
                 QuoteRecord(
                     created_at=record.created_at,
                     postal_code=record.postal_code,
-                    zone=record.zone,
+                    zone=record.zone.value,
                     effective_weight_kg=record.effective_weight_kg,
                     best_carrier=record.best_carrier,
                     best_amount_ars=record.best_amount_ars,
@@ -25,7 +26,7 @@ class SQLiteQuoteHistory(QuoteHistoryPort):
         finally:
             db.close()
 
-    async def list_recent(self, limit: int = 20) -> list[QuoteRecordData]:
+    async def list_recent(self, limit: int = DEFAULT_HISTORY_LIMIT) -> list[QuoteRecordData]:
         db = database.SessionLocal()
         try:
             rows = db.query(QuoteRecord).order_by(QuoteRecord.id.desc()).limit(limit).all()
@@ -33,7 +34,7 @@ class SQLiteQuoteHistory(QuoteHistoryPort):
                 QuoteRecordData(
                     created_at=row.created_at,
                     postal_code=row.postal_code,
-                    zone=row.zone,
+                    zone=Zone(row.zone),
                     effective_weight_kg=row.effective_weight_kg,
                     best_carrier=row.best_carrier,
                     best_amount_ars=row.best_amount_ars,

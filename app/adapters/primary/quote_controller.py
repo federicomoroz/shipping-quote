@@ -3,20 +3,26 @@ from pydantic import BaseModel, Field
 
 from app.domain.package import PackageTooHeavyError
 from app.domain.trace import TraceRecorder
-from app.domain.zones import InvalidPostalCodeError
+from app.domain.zones import MAX_POSTAL_CODE, MIN_POSTAL_CODE, InvalidPostalCodeError
 from app.ports.quote_history_port import QuoteHistoryPort
 from app.ports.shipping_quote_port import QuoteRequest, ShippingQuotePort
 
 router = APIRouter(prefix="/api")
 
+# Techos de sanidad del input HTTP: mas permisivos que las reglas de negocio
+# del dominio (ver PackageTooHeavyError) a proposito, para que sea el dominio
+# -no un 422 generico de Pydantic- el que explique por que se rechazo.
+MAX_INPUT_WEIGHT_KG = 100.0
+MAX_INPUT_DIMENSION_CM = 200.0
+
 
 class QuotePayload(BaseModel):
-    weight_kg: float = Field(gt=0, le=100)
-    length_cm: float = Field(gt=0, le=200)
-    width_cm: float = Field(gt=0, le=200)
-    height_cm: float = Field(gt=0, le=200)
+    weight_kg: float = Field(gt=0, le=MAX_INPUT_WEIGHT_KG)
+    length_cm: float = Field(gt=0, le=MAX_INPUT_DIMENSION_CM)
+    width_cm: float = Field(gt=0, le=MAX_INPUT_DIMENSION_CM)
+    height_cm: float = Field(gt=0, le=MAX_INPUT_DIMENSION_CM)
     declared_value_ars: float = Field(ge=0)
-    postal_code: int = Field(ge=1000, le=9999)
+    postal_code: int = Field(ge=MIN_POSTAL_CODE, le=MAX_POSTAL_CODE)
 
 
 def get_use_case(request: Request) -> ShippingQuotePort:
@@ -53,7 +59,7 @@ async def post_quote(payload: QuotePayload, use_case: ShippingQuotePort = Depend
 
 @router.get("/history")
 async def get_history_route(history: QuoteHistoryPort = Depends(get_history)):
-    records = await history.list_recent(limit=20)
+    records = await history.list_recent()
     return [
         {
             "id": r.id,

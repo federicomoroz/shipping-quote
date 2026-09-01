@@ -51,11 +51,9 @@ app/
 ├── ports/              # ShippingQuotePort (primario), CarrierPort y QuoteHistoryPort (secundarios)
 ├── use_cases/          # QuoteShippingUseCase + el pipeline de pasos de dominio
 ├── adapters/
-│   ├── primary/         # quote_controller.py — traduce HTTP -> QuoteRequest
-│   └── secondary/       # 3 adaptadores de carrier + SQLiteQuoteHistory
+│   ├── primary/         # quote_controller.py (HTTP -> QuoteRequest) + spa.py (la UI)
+│   └── secondary/       # 3 adaptadores de carrier + sqlite/ (QuoteHistoryPort + su modelo ORM)
 ├── external_mocks/     # simulación de las 3 APIs reales, cada una con su propio JSON
-├── models/orm.py        # tabla de historial (SQLAlchemy)
-├── views/templates/    # UI, un solo archivo Python (sin Jinja ni build step)
 └── main.py             # composition root: arma todo en el lifespan
 ```
 

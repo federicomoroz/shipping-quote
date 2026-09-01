@@ -1,6 +1,7 @@
 from app.domain.trace import TraceRecorder
+from app.domain.zones import Zone
 from app.ports.carrier_port import CarrierPort, CarrierQuote, CarrierUnavailableError
-from app.ports.quote_history_port import QuoteHistoryPort, QuoteRecordData
+from app.ports.quote_history_port import DEFAULT_HISTORY_LIMIT, QuoteHistoryPort, QuoteRecordData
 from app.ports.shipping_quote_port import QuoteRequest
 from app.use_cases.quote_shipping import QuoteShippingUseCase
 
@@ -26,7 +27,7 @@ class _FakeHistory(QuoteHistoryPort):
     async def save(self, record: QuoteRecordData) -> None:
         self.saved.append(record)
 
-    async def list_recent(self, limit: int = 20):
+    async def list_recent(self, limit: int = DEFAULT_HISTORY_LIMIT):
         return list(reversed(self.saved))[:limit]
 
 
@@ -45,7 +46,7 @@ async def test_use_case_returns_all_carrier_results():
 
     response = await use_case.execute(_request(), TraceRecorder())
 
-    assert response.zone == "AMBA"
+    assert response.zone == Zone.AMBA
     assert len(response.results) == 2
     assert all(r.ok for r in response.results)
     assert history.saved

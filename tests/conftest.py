@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 import app.core.database as database
-from app.models.orm import QuoteRecord  # noqa: F401 - registra la tabla en Base.metadata
+from app.adapters.secondary.sqlite.orm import QuoteRecord  # noqa: F401 - registra la tabla en Base.metadata
 
 
 @pytest.fixture(autouse=True)

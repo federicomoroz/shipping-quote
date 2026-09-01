@@ -1,15 +1,15 @@
 import pytest
 
-from app.domain.zones import InvalidPostalCodeError, classify_zone
+from app.domain.zones import InvalidPostalCodeError, Zone, classify_zone
 
 
 @pytest.mark.parametrize(
     "postal_code,expected_zone",
     [
-        (1425, "AMBA"),
-        (1900, "Interior"),
-        (8400, "Patagonia"),
-        (9500, "Interior"),
+        (1425, Zone.AMBA),
+        (1900, Zone.INTERIOR),
+        (8400, Zone.PATAGONIA),
+        (9500, Zone.INTERIOR),
     ],
 )
 def test_classify_zone(postal_code, expected_zone):

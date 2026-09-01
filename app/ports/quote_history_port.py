@@ -2,12 +2,17 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 
+from app.domain.zones import Zone
+
+
+DEFAULT_HISTORY_LIMIT = 20
+
 
 @dataclass(frozen=True)
 class QuoteRecordData:
     created_at: datetime
     postal_code: int
-    zone: str
+    zone: Zone
     effective_weight_kg: float
     best_carrier: str | None
     best_amount_ars: float | None
@@ -15,10 +20,10 @@ class QuoteRecordData:
 
 
 class QuoteHistoryPort(ABC):
-    """Puerto secundario #2: persistencia de cotizaciones, intercambiable como cualquier otro adaptador."""
+    """Puerto secundario #2: persistencia, intercambiable como cualquier otro adaptador."""
 
     @abstractmethod
     async def save(self, record: QuoteRecordData) -> None: ...
 
     @abstractmethod
-    async def list_recent(self, limit: int = 20) -> list[QuoteRecordData]: ...
+    async def list_recent(self, limit: int = DEFAULT_HISTORY_LIMIT) -> list[QuoteRecordData]: ...

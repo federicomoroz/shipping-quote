@@ -6,6 +6,7 @@ from app.adapters.secondary.oca_adapter import OCAAdapter
 from app.core.http_client import build_carrier_client
 from app.domain.package import build_package
 from app.domain.trace import TraceRecorder
+from app.domain.zones import Zone
 from app.external_mocks.carrier_mocks import mocks_app
 from app.ports.carrier_port import CarrierQuote, CarrierUnavailableError
 
@@ -26,7 +27,7 @@ async def test_correo_argentino_adapter_translates_shape(carrier_client, monkeyp
     adapter = CorreoArgentinoAdapter(carrier_client)
     tracer = TraceRecorder()
 
-    quote = await adapter.get_rate(_package(), "AMBA", tracer)
+    quote = await adapter.get_rate(_package(), Zone.AMBA, tracer)
 
     assert isinstance(quote, CarrierQuote)
     assert quote.amount_ars > 0
@@ -40,18 +41,18 @@ async def test_correo_argentino_adapter_raises_when_carrier_fails(carrier_client
     adapter = CorreoArgentinoAdapter(carrier_client)
 
     with pytest.raises(CarrierUnavailableError):
-        await adapter.get_rate(_package(), "AMBA", TraceRecorder())
+        await adapter.get_rate(_package(), Zone.AMBA, TraceRecorder())
 
 
 async def test_oca_adapter_translates_shape(carrier_client):
     adapter = OCAAdapter(carrier_client)
-    quote = await adapter.get_rate(_package(), "Interior", TraceRecorder())
+    quote = await adapter.get_rate(_package(), Zone.INTERIOR, TraceRecorder())
     assert quote.amount_ars > 0
     assert quote.eta_days > 0
 
 
 async def test_andreani_adapter_translates_shape(carrier_client):
     adapter = AndreaniAdapter(carrier_client)
-    quote = await adapter.get_rate(_package(), "Patagonia", TraceRecorder())
+    quote = await adapter.get_rate(_package(), Zone.PATAGONIA, TraceRecorder())
     assert quote.amount_ars > 0
     assert quote.eta_days > 0

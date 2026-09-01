@@ -2,6 +2,7 @@ import pytest
 
 from app.domain.package import PackageTooHeavyError
 from app.domain.trace import TraceRecorder
+from app.domain.zones import Zone
 from app.ports.shipping_quote_port import QuoteRequest
 from app.use_cases.pipeline import ClassifyZoneStep, QuoteContext, ValidateEligibilityStep
 
@@ -32,5 +33,5 @@ async def test_validate_eligibility_step_raises_for_heavy_package():
 async def test_classify_zone_step_sets_zone_and_traces():
     ctx = QuoteContext(request=_request(postal_code=8400), tracer=TraceRecorder())
     await ClassifyZoneStep().execute(ctx)
-    assert ctx.zone == "Patagonia"
+    assert ctx.zone == Zone.PATAGONIA
     assert ctx.tracer.entries[-1].label == "ClassifyZoneStep"

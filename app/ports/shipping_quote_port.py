@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from app.domain.trace import TraceEntry, Tracer
+from app.domain.zones import Zone
 
 
 @dataclass(frozen=True)
@@ -25,7 +26,7 @@ class CarrierResult:
 
 @dataclass(frozen=True)
 class QuoteResponse:
-    zone: str
+    zone: Zone
     effective_weight_kg: float
     results: list[CarrierResult]
     trace: list[TraceEntry]
