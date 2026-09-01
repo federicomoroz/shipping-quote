@@ -5,3 +5,9 @@ services:
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      # Sin esto Render usa Python 3.14 por default, y pydantic-core todavia
+      # no tiene wheel precompilado para esa version (intenta compilar con
+      # Rust y falla: el filesystem de build de Render es read-only).
+      - key: PYTHON_VERSION
+        value: 3.13.5
