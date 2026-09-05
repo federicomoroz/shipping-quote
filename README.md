@@ -2,9 +2,8 @@
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/federicomoroz/shipping-quote)
 
-Cotizador de envíos que existe para mostrar un circuito de arquitectura hexagonal
-funcionando de verdad, no como diagrama: cada request real que procesa queda
-trazado hop por hop, desde que entra por HTTP hasta que tres transportistas
+Cotizador de envíos con arquitectura hexagonal de punta a punta: cada request
+queda trazado hop por hop, desde que entra por HTTP hasta que tres transportistas
 distintos devuelven su propia cotización.
 
 **Demo en vivo:** [shipping-quote.onrender.com](https://shipping-quote.onrender.com/) _(free tier: se duerme tras 15 min sin tráfico, el primer request tarda ~30-50s)_
